@@ -1,14 +1,24 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
 )
 
+type State int
+
+const (
+	New State = iota + 1
+	Done
+	inProgress
+)
+
 type Task struct {
-	Name  string
-	State string
+	id    int    `json:"id"`
+	name  string `json:"nameTask"`
+	state State  `json:"state"`
 }
 
 func main() {
@@ -21,35 +31,60 @@ func main() {
 	fmt.Println(asciiArt)
 	// call for open file json
 	createJson()
-	for true {
+	var dynamicInput []string
+	for {
 		var userInput string
 		fmt.Print(">> ")
-		fmt.Scanln(&userInput)
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan() // Read the next line of input
+		userInput = scanner.Text()
 		userInput = strings.ToLower(userInput)
-		// if len(os.Args) < 2 {
-		// 	fmt.Println("Usage:", os.Args[0], "<argument>")
-		// 	os.Exit(1)
-		// }
-		// fmt.Println("Program name: ", os.Args[0])
-		// for i, arg := range os.Args[1:] {
-		// 	fmt.Printf("Arg %d: %s\n", i+1, arg)
-		// }
+		// userInput = strings.TrimSpace(userInput)
+		dynamicInput = strings.Fields(userInput)
+		for i := 0; i < len(dynamicInput); i++ {
+			fmt.Println(dynamicInput[i])
+		}
+		if userInput == "add" {
+
+		}
+
+		if userInput == "list" {
+			// show all work and its state
+		}
+
 		if userInput == "exit" {
+			//Check if there is any inProgress or new work
+			// func
 			// Maybe add hello goodbye stuff
-			fmt.Println("")
-			break
+			goodByeUser()
+			// break
 		}
 
 	}
 }
 
 func createJson() {
-	f, err := os.Create("output.json")
-	if err != nil {
-		err = os.Remove("output.json")
-		f, err = os.Create("output.json")
-		defer f.Close()
-	}
+	// Define the file name
+	fileName := "output.json"
 
-	defer f.Close()
+	// Check if the file exists
+	_, err := os.Stat(fileName)
+	if err == nil {
+		err := os.Remove(fileName)
+		if err != nil {
+			fmt.Println("Error deleting the file:", err)
+			return
+		}
+		fmt.Println("File deleted successfully.")
+	}
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+}
+
+func goodByeUser() {
+	fmt.Println("Happy working")
 }
